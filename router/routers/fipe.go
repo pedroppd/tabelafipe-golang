@@ -1,11 +1,14 @@
 package routers
 
-import "net/http"
+import (
+	"net/http"
+	"tabela-fipe-golang/gateways"
+)
 
 var fipeRoutes = []Router{
 	{
 		URI:    "/fipe-historic",
 		Method: http.MethodPost,
-		Func:   func(http.ResponseWriter, *http.Request) {},
+		Func:   gateways.GetFipeHistoric,
 	},
 }

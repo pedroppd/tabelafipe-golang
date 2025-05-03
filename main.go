@@ -1,15 +1,14 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"tabela-fipe-golang/router"
+)
 
 func main() {
-	server := gin.Default()
-
-	server.GET("/health-check", func(ctx *gin.Context) {
-		ctx.JSON(200, gin.H{
-			"message": "API is health",
-		})
-	})
-
-	server.Run(":8000")
+	fmt.Printf("API is running...")
+	router := router.Generate()
+	log.Fatal(http.ListenAndServe(":5000", router))
 }
