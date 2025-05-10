@@ -53,11 +53,10 @@ func filterByYear(referenceTables []models.ReferenceTable, r *http.Request) []mo
 		year := referenceTable.GetYear()
 		month := referenceTable.GetMonth()
 
-		if beginYear >= year && endYear <= year {
-			newReferenceTables = append(newReferenceTables, referenceTable)
-		}
+		isInYearRange := year >= beginYear && year <= endYear
+		isInMonthList := len(months) == 0 || shared.Contains(months, month)
 
-		if month != "" && shared.Contains(months, month) {
+		if isInYearRange && isInMonthList {
 			newReferenceTables = append(newReferenceTables, referenceTable)
 		}
 	}
