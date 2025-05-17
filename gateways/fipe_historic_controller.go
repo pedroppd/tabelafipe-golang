@@ -2,6 +2,7 @@ package gateways
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -11,27 +12,51 @@ import (
 	"tabela-fipe-golang/shared"
 )
 
-func GetFipeHistoric(w http.ResponseWriter, r *http.Request) []models.ReferenceTable {
+func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 	historicFipeTableBody, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error to try read the body", http.StatusInternalServerError)
-		return []models.ReferenceTable{}
+		return
 	}
 
 	var fipeTable models.FipeTable
 
 	if err = json.Unmarshal(historicFipeTableBody, &fipeTable); err != nil {
 		http.Error(w, "Error to try parse the body", http.StatusBadRequest)
-		return []models.ReferenceTable{}
+		return
 	}
 
 	referenceTables, err := externalapi.GetReferenceTables()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return []models.ReferenceTable{}
+		return
+	}
+	fmt.Println("Filtering...")
+	referenceTableFilteredList := filterByYear(referenceTables, r)
+
+	fmt.Println("Building request object...")
+	var fipeTableList []models.FipeTableHistoric
+	for _, referenceTableFiltered := range referenceTableFilteredList {
+		fipeTableHistoric := buildFipeTableHistoric(fipeTable, referenceTableFiltered.GetCodigo())
+		fipeTableList = append(fipeTableList, fipeTableHistoric)
 	}
 
-	return filterByYear(referenceTables, r)
+	for _, fipeTableHistoric := range fipeTableList {
+		fmt.Println(fipeTableHistoric)
+	}
+}
+
+func buildFipeTableHistoric(fipeTable models.FipeTable, referenceTable uint64) models.FipeTableHistoric {
+	return models.FipeTableHistoric{CodigoTipoVeiculo: fipeTable.CodigoTipoVeiculo,
+		CodigoTabelaReferencia: referenceTable,
+		CodigoModelo:           fipeTable.CodigoModelo,
+		CodigoMarca:            fipeTable.CodigoMarca,
+		CodigoTipoCombustivel:  1,
+		AnoModelo:              fipeTable.AnoModelo,
+		TipoVeiculo:            "carro",
+		ModeloCodigoExterno:    "",
+		TipoConsulta:           "tradicional",
+	}
 }
 
 func filterByYear(referenceTables []models.ReferenceTable, r *http.Request) []models.ReferenceTable {
@@ -48,7 +73,7 @@ func filterByYear(referenceTables []models.ReferenceTable, r *http.Request) []mo
 	}
 
 	months := getMonths(query)
-	monthsSet := shared.ToSet(months) // opcional: cria um map[string]bool pra lookup rápido
+	monthsSet := shared.ToSet(months)
 
 	for _, referenceTable := range referenceTables {
 		year := referenceTable.GetYear()

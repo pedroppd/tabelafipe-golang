@@ -6,8 +6,12 @@ import (
 )
 
 type ReferenceTable struct {
-	Codigo int    `json:"Codigo"`
+	Codigo uint64 `json:"Codigo"`
 	Mes    string `json:"Mes"`
+}
+
+func (referenceTable *ReferenceTable) GetCodigo() uint64 {
+	return referenceTable.Codigo
 }
 
 func (referenceTable *ReferenceTable) GetYear() int {

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	fmt.Printf("API is running...")
+	fmt.Println("API is running...")
 	router := router.Generate()
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
