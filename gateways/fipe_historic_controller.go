@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"sync"
 	"tabela-fipe-golang/externalapi"
 	"tabela-fipe-golang/models"
 	"tabela-fipe-golang/shared"
@@ -41,9 +42,15 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 		fipeTableList = append(fipeTableList, fipeTableHistoric)
 	}
 
+	var wg sync.WaitGroup
+	responseChannel := make(chan models.FipeTableResponse, len(fipeTableList))
+
 	for _, fipeTableHistoric := range fipeTableList {
-		fmt.Println(fipeTableHistoric)
+		wg.Add(1)
+		externalapi.GetFipeTable(fipeTableHistoric, &wg, responseChannel)
 	}
+	wg.Wait()
+	close(responseChannel)
 }
 
 func buildFipeTableHistoric(fipeTable models.FipeTable, referenceTable uint64) models.FipeTableHistoric {
