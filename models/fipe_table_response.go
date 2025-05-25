@@ -13,10 +13,3 @@ type Body struct {
 	SiglaCombustivel string  `json:"siglaCombustivel,omitempty"`
 	DataConsulta     string  `json:"dataConsulta,omitempty"`
 }
-
-type FipeTableResponse struct {
-	Name       string `json:"name,omitempty"`
-	StatusCode int    `json:"statusCode,omitempty"`
-	Body       string `json:"body,omitempty"`
-	Err        error  `json:"error,omitempty"`
-}

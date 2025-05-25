@@ -14,15 +14,15 @@ import (
 )
 
 func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
-	historicFipeTableBody, err := io.ReadAll(r.Body)
+	fipeTableRequestUnparsed, err := io.ReadAll(r.Body)
 	if err != nil {
 		http.Error(w, "Error to try read the body", http.StatusInternalServerError)
 		return
 	}
 
-	var fipeTable models.FipeTable
+	var fipeTableRequest models.FipeTableRequest
 
-	if err = json.Unmarshal(historicFipeTableBody, &fipeTable); err != nil {
+	if err = json.Unmarshal(fipeTableRequestUnparsed, &fipeTableRequest); err != nil {
 		http.Error(w, "Error to try parse the body", http.StatusBadRequest)
 		return
 	}
@@ -36,21 +36,30 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 	referenceTableFilteredList := filterByYear(referenceTables, r)
 
 	fmt.Println("Building request object...")
-	var fipeTableList []models.FipeTableHistoric
+	var fipeTableRequestList []models.FipeTableHistoric
 	for _, referenceTableFiltered := range referenceTableFilteredList {
-		fipeTableHistoric := buildFipeTableHistoric(fipeTable, referenceTableFiltered.GetCodigo())
-		fipeTableList = append(fipeTableList, fipeTableHistoric)
+		fipeTableHistoric := buildFipeTableHistoric(fipeTableRequest, referenceTableFiltered.GetCodigo())
+		fipeTableRequestList = append(fipeTableRequestList, fipeTableHistoric)
 	}
 
+	fmt.Println("Building request object to fipe table...")
 	var wg sync.WaitGroup
-	responseChannel := make(chan models.FipeTableResponse, len(fipeTableList))
+	responseChannel := make(chan models.HttpResponse, len(fipeTableRequestList))
 
-	for _, fipeTableHistoric := range fipeTableList {
+	for _, fipeTableRequest := range fipeTableRequestList {
 		wg.Add(1)
-		externalapi.GetFipeTable(fipeTableHistoric, &wg, responseChannel)
+		externalapi.GetFipeTable(fipeTableRequest, &wg, responseChannel)
 	}
 	wg.Wait()
 	close(responseChannel)
+
+	for res := range responseChannel {
+		if res.StatusCode == 200 {
+			fmt.Printf("[OK] Status %d \n\n", res.StatusCode)
+		} else {
+			fmt.Printf("[ERROR] %v\n", res.Err)
+		}
+	}
 }
 
 func buildFipeTableHistoric(fipeTable models.FipeTable, referenceTable uint64) models.FipeTableHistoric {
