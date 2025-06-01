@@ -36,7 +36,7 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 	referenceTableFilteredList := filterByYear(referenceTables, r)
 
 	fmt.Println("Building request object...")
-	var fipeTableRequestList []models.FipeTableHistoric
+	var fipeTableRequestList []models.FipeTable
 	for _, referenceTableFiltered := range referenceTableFilteredList {
 		fipeTableHistoric := buildFipeTableHistoric(fipeTableRequest, referenceTableFiltered.GetCodigo())
 		fipeTableRequestList = append(fipeTableRequestList, fipeTableHistoric)
@@ -53,17 +53,26 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 	wg.Wait()
 	close(responseChannel)
 
+	var fipeTableRequestResponse []models.FipeTableRequestResponse
 	for res := range responseChannel {
-		if res.StatusCode == 200 {
-			fmt.Printf("[OK] Status %d \n\n", res.StatusCode)
+		if res.IsSuccess() {
+			result := models.FipeTableRequestResponse{ResponseBody: res.GetBodyResponse(), RequestBody: res.GetBodyRequest(), StatusCode: res.StatusCode}
+			fipeTableRequestResponse = append(fipeTableRequestResponse, result)
 		} else {
-			fmt.Printf("[ERROR] %v\n", res.Err)
+			result := models.FipeTableRequestResponse{ResponseBody: nil, RequestBody: res.GetBodyRequest(), StatusCode: res.StatusCode}
+			fipeTableRequestResponse = append(fipeTableRequestResponse, result)
 		}
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(fipeTableRequestResponse); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+		return
 	}
 }
 
-func buildFipeTableHistoric(fipeTable models.FipeTable, referenceTable uint64) models.FipeTableHistoric {
-	return models.FipeTableHistoric{CodigoTipoVeiculo: fipeTable.CodigoTipoVeiculo,
+func buildFipeTableHistoric(fipeTable models.FipeTableRequest, referenceTable uint64) models.FipeTable {
+	return models.FipeTable{CodigoTipoVeiculo: fipeTable.CodigoTipoVeiculo,
 		CodigoTabelaReferencia: referenceTable,
 		CodigoModelo:           fipeTable.CodigoModelo,
 		CodigoMarca:            fipeTable.CodigoMarca,

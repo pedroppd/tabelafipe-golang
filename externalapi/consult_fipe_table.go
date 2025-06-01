@@ -10,7 +10,7 @@ import (
 	"tabela-fipe-golang/models"
 )
 
-func GetFipeTable(fipeTableRequest models.FipeTableHistoric, wg *sync.WaitGroup, ch chan<- models.HttpResponse) {
+func GetFipeTable(fipeTableRequest models.FipeTable, wg *sync.WaitGroup, ch chan<- models.HttpResponse) {
 	url := "http://veiculos.fipe.org.br/api/veiculos/ConsultarValorComTodosParametros"
 	defer wg.Done()
 	jsonData, err := json.Marshal(fipeTableRequest)
