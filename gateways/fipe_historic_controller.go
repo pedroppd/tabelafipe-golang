@@ -56,9 +56,11 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 	var fipeTableRequestResponse []models.FipeTableRequestResponse
 	for res := range responseChannel {
 		if res.IsSuccess() {
+			fmt.Println("Building request object with status: 200")
 			result := models.FipeTableRequestResponse{ResponseBody: res.GetBodyResponse(), RequestBody: res.GetBodyRequest(), StatusCode: res.StatusCode}
 			fipeTableRequestResponse = append(fipeTableRequestResponse, result)
 		} else {
+			fmt.Println("Building request object with status: ", res.StatusCode)
 			result := models.FipeTableRequestResponse{ResponseBody: nil, RequestBody: res.GetBodyRequest(), StatusCode: res.StatusCode}
 			fipeTableRequestResponse = append(fipeTableRequestResponse, result)
 		}
