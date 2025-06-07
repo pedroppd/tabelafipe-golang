@@ -27,7 +27,7 @@ func (httpResponse *HttpResponse) GetBodyRequest() *FipeTable {
 
 func (httpResponse *HttpResponse) GetBodyResponse() *FipeTableResponse {
 	var fipeTableResponse FipeTableResponse
-	fmt.Printf("Tentando parsear BodyResponse: %s\n", string(httpResponse.BodyResponse))
+	fmt.Println(string(httpResponse.BodyResponse))
 	if err := json.Unmarshal(httpResponse.BodyResponse, &fipeTableResponse); err != nil {
 		fmt.Printf("Erro ao fazer unmarshal de BodyRequest: %v\n", err)
 		return nil

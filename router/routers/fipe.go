@@ -11,4 +11,9 @@ var fipeRoutes = []Router{
 		Method: http.MethodPost,
 		Func:   gateways.GetFipeHistoric,
 	},
+	{
+		URI:    "/fipe-historic/reprocess",
+		Method: http.MethodPost,
+		Func:   gateways.GetFipeHistoricReprocessed,
+	},
 }

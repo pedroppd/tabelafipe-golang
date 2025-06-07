@@ -80,9 +80,10 @@ func buildFipeTableHistoric(fipeTable models.FipeTableRequest, referenceTable ui
 		CodigoMarca:            fipeTable.CodigoMarca,
 		CodigoTipoCombustivel:  1,
 		AnoModelo:              fipeTable.AnoModelo,
-		TipoVeiculo:            "carro",
-		ModeloCodigoExterno:    "",
-		TipoConsulta:           "tradicional",
+
+		TipoVeiculo:         "carro",
+		ModeloCodigoExterno: "",
+		TipoConsulta:        "tradicional",
 	}
 }
 

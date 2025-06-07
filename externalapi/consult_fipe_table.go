@@ -18,6 +18,7 @@ func GetFipeTable(fipeTableRequest models.FipeTable, wg *sync.WaitGroup, ch chan
 		ch <- models.HttpResponse{BodyRequest: jsonData, Err: fmt.Errorf("JSON marshal error: %w", err)}
 		return
 	}
+	fmt.Println(string(jsonData))
 
 	response, err := http.Post(url, "application/json", bytes.NewBuffer(jsonData))
 
