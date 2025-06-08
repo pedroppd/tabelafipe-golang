@@ -50,6 +50,9 @@ func GetFipeHistoricReprocessed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	if fipeTableRequestResponse == nil {
+		fipeTableRequestResponse = make([]models.FipeTableRequestResponse, 0)
+	}
 	if err := json.NewEncoder(w).Encode(fipeTableRequestResponse); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 		return
