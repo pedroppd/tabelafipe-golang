@@ -89,9 +89,10 @@ func buildFipeTableHistoric(fipeTable models.FipeTableRequest, referenceTable ui
 func filterByYear(referenceTables []models.ReferenceTable, r *http.Request, fipeTableRequest models.FipeTableRequest) []models.ReferenceTable {
 	var newReferenceTables []models.ReferenceTable
 	query := r.URL.Query()
+	anoModelo := int(fipeTableRequest.AnoModelo)
 	beginYear, err := shared.ParseStringToInt(query.Get("beginYear"))
-	if err != nil {
-		beginYear = int(fipeTableRequest.AnoModelo)
+	if err != nil || beginYear < anoModelo {
+		beginYear = anoModelo
 	}
 	endYear, err := shared.ParseStringToInt(query.Get("endYear"))
 	if err != nil {
