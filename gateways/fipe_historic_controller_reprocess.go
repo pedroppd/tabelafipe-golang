@@ -18,7 +18,7 @@ func GetFipeHistoricReprocessed(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var fipeTableRequestList []models.FipeTableRequestResponse
-	if err = json.Unmarshal(fipeTableRequestUnparsed, &fipeTableRequestList); err != nil {
+	if err := json.Unmarshal(fipeTableRequestUnparsed, &fipeTableRequestList); err != nil {
 		http.Error(w, "Error to try parse the body", http.StatusBadRequest)
 		return
 	}

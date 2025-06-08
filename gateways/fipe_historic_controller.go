@@ -33,7 +33,7 @@ func GetFipeHistoric(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Println("Filtering...")
-	referenceTableFilteredList := filterByYear(referenceTables, r)
+	referenceTableFilteredList := filterByYear(referenceTables, r, fipeTableRequest)
 
 	fmt.Println("Building request object...")
 	var fipeTableRequestList []models.FipeTable
@@ -80,21 +80,19 @@ func buildFipeTableHistoric(fipeTable models.FipeTableRequest, referenceTable ui
 		CodigoMarca:            fipeTable.CodigoMarca,
 		CodigoTipoCombustivel:  1,
 		AnoModelo:              fipeTable.AnoModelo,
-
-		TipoVeiculo:         "carro",
-		ModeloCodigoExterno: "",
-		TipoConsulta:        "tradicional",
+		TipoVeiculo:            "carro",
+		ModeloCodigoExterno:    "",
+		TipoConsulta:           "tradicional",
 	}
 }
 
-func filterByYear(referenceTables []models.ReferenceTable, r *http.Request) []models.ReferenceTable {
+func filterByYear(referenceTables []models.ReferenceTable, r *http.Request, fipeTableRequest models.FipeTableRequest) []models.ReferenceTable {
 	var newReferenceTables []models.ReferenceTable
 	query := r.URL.Query()
 	beginYear, err := shared.ParseStringToInt(query.Get("beginYear"))
 	if err != nil {
-		beginYear = 0
+		beginYear = int(fipeTableRequest.AnoModelo)
 	}
-
 	endYear, err := shared.ParseStringToInt(query.Get("endYear"))
 	if err != nil {
 		endYear = 9999

@@ -49,7 +49,7 @@ func (referenceTable *ReferenceTable) GetCodigo() uint64 {
 }
 
 func (referenceTable *ReferenceTable) GetYear() int {
-	year := strings.Split(referenceTable.Mes, "/")[1]
+	year := strings.Trim(strings.Split(referenceTable.Mes, "/")[1], " ")
 	value, _ := shared.ParseStringToInt(year)
 	return value
 }
